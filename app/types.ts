@@ -1,16 +1,16 @@
-type Person = {
+export type Person = {
     id : string;
     name : string;
 };
 
-type Item = {
+export type Item = {
     id : string;
     name : string;
     priceCents : number;
     splitAmongst : string[];
 }
 
-type Tab = {
+export type Tab = {
     name : string;
     people : Person[];
     items : Item[];
