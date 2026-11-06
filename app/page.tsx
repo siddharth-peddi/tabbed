@@ -26,7 +26,11 @@ export default function Home() {
       <button className = "border px-3 py-1 rounded" onClick = {addPerson}>
         Add
       </button>
-      <p> {people.length} people added </p>       
+      <ul> 
+        {people.map((person) => (
+          <li key = {person.id}>{person.name}</li>
+        ))}
+      </ul>     
     </main>
   );
 }
