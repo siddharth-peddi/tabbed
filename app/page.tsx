@@ -14,6 +14,10 @@ export default function Home() {
     setName("");
   }
 
+  function removePerson(id: string) {
+    setPeople(people.filter((person) => person.id !== id))
+  }
+
   return (
     <main>
       <h1> Tabbed </h1>
@@ -28,7 +32,12 @@ export default function Home() {
       </button>
       <ul> 
         {people.map((person) => (
-          <li key = {person.id}>{person.name}</li>
+          <li key = {person.id} className="flex justify-between items-center w-64 py-1">
+            {person.name}
+            <button onClick = {() => removePerson(person.id)}>
+              x
+            </button>
+          </li>
         ))}
       </ul>     
     </main>
