@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { splitEvenly, subtotalsByPerson } from "./split";
+import { splitProportionally } from "./split";
 
 describe("splitEvenly", () => {
   it("splits evenly when the amount divides", () => {
@@ -24,3 +25,14 @@ describe("subtotalsByPerson", () => {
     expect(subtotalsByPerson(items)).toEqual({ a: 2000, b: 1000 });
   });
 });
+
+describe("splitProportionally", () => {
+    it("splits in proportion and keeps the exact total", () => {
+      // a ordered $20, b ordered $10, so $1.00 of tax splits 67 / 33 cents
+      expect(splitProportionally(100, { a: 2000, b: 1000 })).toEqual({ a: 67, b: 33 });
+    });
+  
+    it("returns nothing when there is nothing to split by", () => {
+      expect(splitProportionally(100, {})).toEqual({});
+    });
+  });
