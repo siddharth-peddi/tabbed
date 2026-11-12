@@ -20,6 +20,12 @@ export default function Home() {
 
   function removePerson(id: string) {
     setPeople(people.filter((person) => person.id !== id));
+    setItems(
+      items.map((item) => ({
+        ...item,
+        splitAmongst: item.splitAmongst.filter((personId) => personId !== id),
+      }))
+    );
   }
 
   function addItem() {
