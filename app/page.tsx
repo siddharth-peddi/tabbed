@@ -36,6 +36,21 @@ export default function Home() {
     setItemPrice("");
   }
 
+  function toggleShare(itemId: string, personId: string) {
+    setItems(
+      items.map((item) => {
+        if (item.id !== itemId) return item;
+        const alreadyIn = item.splitAmongst.includes(personId);
+        return {
+          ...item,
+          splitAmongst: alreadyIn
+            ? item.splitAmongst.filter((id) => id !== personId)
+            : [...item.splitAmongst, personId],
+        };
+      })
+    );
+  }
+
   return (
     <main className="mx-auto max-w-md p-6 space-y-8">
       <h1 className="text-3xl font-bold">Tabbed</h1>
@@ -90,10 +105,29 @@ export default function Home() {
         </div>
         <ul className="divide-y">
           {items.map((item) => (
-            <li key={item.id} className="flex justify-between py-2">
-              <span>{item.name}</span>
-              <span>{formatCents(item.priceCents)}</span>
-            </li>
+            <li key={item.id} className="py-3 space-y-2">
+              <div className="flex justify-between">
+                <span>{item.name}</span>
+                <span>{formatCents(item.priceCents)}</span>
+              </div>
+            <div className="flex flex-wrap gap-2">
+              {people.map((person) => {
+              const selected = item.splitAmongst.includes(person.id);
+              return (
+                <button
+                  key={person.id}
+                  aria-pressed={selected}
+                  onClick={() => toggleShare(item.id, person.id)}
+                  className={`rounded-full border px-3 py-1 text-sm ${
+                  selected ? "bg-blue-600 text-white border-blue-600" : ""
+                }`}
+              >
+                {person.name}
+              </button>
+            );
+          })}
+        </div>
+      </li>
           ))}
         </ul>
       </section>
