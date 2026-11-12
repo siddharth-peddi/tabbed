@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Person, Item } from "./types";
 import { toCents, formatCents } from "./money";
+import { subtotalsByPerson } from "./split";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -56,6 +57,8 @@ export default function Home() {
       })
     );
   }
+
+const subtotals = subtotalsByPerson(items);
 
   return (
     <main className="mx-auto max-w-md p-6 space-y-8">
@@ -137,6 +140,17 @@ export default function Home() {
           ))}
         </ul>
       </section>
+      <section className="space-y-3">
+  <h2 className="text-lg font-semibold">Each person&apos;s share</h2>
+  <ul className="divide-y">
+    {people.map((person) => (
+      <li key={person.id} className="flex justify-between py-2">
+        <span>{person.name}</span>
+        <span>{formatCents(subtotals[person.id] ?? 0)}</span>
+      </li>
+    ))}
+  </ul>
+</section>
     </main>
   );
 }
