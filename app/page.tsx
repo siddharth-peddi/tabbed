@@ -4,6 +4,9 @@ import { useState } from "react";
 import { Person, Item } from "./types";
 import { toCents, formatCents } from "./money";
 import { subtotalsByPerson, splitProportionally } from "./split";
+import { Card } from "./components/Card";
+import { inputClass, buttonClass } from "./styles";
+import { Background } from "./components/Backgrounds";
 
 export default function Home() {
   // What the user enters (stored)
@@ -84,45 +87,56 @@ export default function Home() {
   }
 
   const getsBack = people
-  .filter((person) => person.id !== paidBy)
-  .reduce((sum, person) => sum + totalFor(person.id), 0);
+    .filter((person) => person.id !== paidBy)
+    .reduce((sum, person) => sum + totalFor(person.id), 0);
 
   return (
-    <main className="mx-auto max-w-md p-6 space-y-8">
-      <h1 className="text-3xl font-bold">Tabbed</h1>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Who&apos;s at the table?</h2>
+    <main className="mx-auto max-w-md space-y-4 px-4 py-10">
+<Background />
+<header className="mb-6">
+  <h1
+    className="bg-clip-text text-4xl font-semibold tracking-tight text-transparent"
+    style={{ backgroundImage: "linear-gradient(90deg, #059669, #0284c7)" }}
+  >
+    Tabbed
+  </h1>
+  <p className="text-neutral-500">Split the bill, item by item.</p>
+</header>
+      <Card title="Who's at the table?">
         <div className="flex gap-2">
           <input
-            className="flex-1 border rounded px-3 py-2"
+            className={`${inputClass} min-w-0 flex-1`}
             placeholder="Friend's name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <button className="border rounded px-4 py-2 font-medium" onClick={addPerson}>
+          <button className={buttonClass} onClick={addPerson}>
             Add
           </button>
         </div>
-        <ul className="divide-y">
-          {people.map((person) => (
-            <li key={person.id} className="flex justify-between items-center py-2">
-              {person.name}
-              <button
-                onClick={() => removePerson(person.id)}
-                aria-label={`Remove ${person.name}`}
-              >
-                ✕
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+        {people.length === 0 ? (
+          <p className="text-sm text-neutral-500">Add everyone who&apos;s eating.</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {people.map((person) => (
+              <li key={person.id} className="flex items-center justify-between py-2">
+                <span>{person.name}</span>
+                <button
+                  className="rounded-full p-2 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700"
+                  onClick={() => removePerson(person.id)}
+                  aria-label={`Remove ${person.name}`}
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Who paid?</h2>
+      <Card title="Who paid?">
         <select
-          className="w-full border rounded px-3 py-2"
+          className={`${inputClass} w-full`}
           value={paidBy}
           onChange={(e) => setPaidBy(e.target.value)}
         >
@@ -133,64 +147,68 @@ export default function Home() {
             </option>
           ))}
         </select>
-      </section>
+      </Card>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">What did you order?</h2>
+      <Card title="What did you order?">
         <div className="flex gap-2">
           <input
-            className="flex-1 border rounded px-3 py-2"
+            className={`${inputClass} min-w-0 flex-1`}
             placeholder="Item"
             value={itemName}
             onChange={(e) => setItemName(e.target.value)}
           />
           <input
-            className="w-24 border rounded px-3 py-2"
+            className={`${inputClass} w-24`}
             placeholder="0.00"
             inputMode="decimal"
             value={itemPrice}
             onChange={(e) => setItemPrice(e.target.value)}
           />
-          <button className="border rounded px-4 py-2 font-medium" onClick={addItem}>
+          <button className={buttonClass} onClick={addItem}>
             Add
           </button>
         </div>
-        <ul className="divide-y">
-          {items.map((item) => (
-            <li key={item.id} className="py-3 space-y-2">
-              <div className="flex justify-between">
-                <span>{item.name}</span>
-                <span>{formatCents(item.priceCents)}</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {people.map((person) => {
-                  const selected = item.splitAmongst.includes(person.id);
-                  return (
-                    <button
-                      key={person.id}
-                      aria-pressed={selected}
-                      onClick={() => toggleShare(item.id, person.id)}
-                      className={`rounded-full border px-3 py-1 text-sm ${
-                        selected ? "bg-blue-600 text-white border-blue-600" : ""
-                      }`}
-                    >
-                      {person.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+        {items.length === 0 ? (
+          <p className="text-sm text-neutral-500">Add the first item from the receipt.</p>
+        ) : (
+          <ul className="divide-y divide-neutral-100">
+            {items.map((item) => (
+              <li key={item.id} className="space-y-3 py-4">
+                <div className="flex justify-between">
+                  <span className="font-medium">{item.name}</span>
+                  <span className="tabular-nums">{formatCents(item.priceCents)}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {people.map((person) => {
+                    const selected = item.splitAmongst.includes(person.id);
+                    return (
+                      <button
+                        key={person.id}
+                        aria-pressed={selected}
+                        onClick={() => toggleShare(item.id, person.id)}
+                        className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                          selected
+                            ? "bg-emerald-600 text-white"
+                            : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                        }`}
+                      >
+                        {person.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Tax and tip</h2>
+      <Card title="Tax and tip">
         <div className="flex gap-2">
           <label className="flex-1 space-y-1">
-            <span className="text-sm">Tax</span>
+            <span className="text-sm text-neutral-500">Tax</span>
             <input
-              className="w-full border rounded px-3 py-2"
+              className={`${inputClass} w-full`}
               placeholder="0.00"
               inputMode="decimal"
               value={tax}
@@ -198,9 +216,9 @@ export default function Home() {
             />
           </label>
           <label className="flex-1 space-y-1">
-            <span className="text-sm">Tip</span>
+            <span className="text-sm text-neutral-500">Tip</span>
             <input
-              className="w-full border rounded px-3 py-2"
+              className={`${inputClass} w-full`}
               placeholder="0.00"
               inputMode="decimal"
               value={tip}
@@ -208,48 +226,54 @@ export default function Home() {
             />
           </label>
         </div>
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-3 text-sm">
           <input
             type="checkbox"
+            className="h-4 w-4 accent-emerald-600"
             checked={splitTip}
             onChange={(e) => setSplitTip(e.target.checked)}
           />
           Split the tip (otherwise {payer ? payer.name : "the payer"} covers it)
         </label>
-      </section>
+      </Card>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Who owes what</h2>
+      <Card title="Who owes what">
         {unassigned.length > 0 && (
-          <p className="text-sm text-amber-700">
+          <p className="text-sm text-amber-600">
             {unassigned.length} item(s) not assigned to anyone yet.
           </p>
         )}
-        {!payer && <p className="text-sm text-amber-700">Pick who paid to see who owes whom.</p>}
-        <ul className="divide-y">
+        {!payer && <p className="text-sm text-amber-600">Pick who paid to see who owes whom.</p>}
+        <ul className="divide-y divide-neutral-100">
           {people.map((person) => (
-            <li key={person.id} className="flex justify-between py-2">
-              <span>
-                {person.name}
-                {payer && person.id !== paidBy && ` owes ${payer.name}`}
-                {person.id === paidBy && " (their share)"}
+            <li key={person.id} className="flex items-center justify-between py-3">
+              <div>
+                <p className="font-medium">{person.name}</p>
+                <p className="text-sm text-neutral-500">
+                  {person.id === paidBy
+                    ? "Their share"
+                    : payer
+                    ? `Owes ${payer.name}`
+                    : "Share"}
+                </p>
+              </div>
+              <span className="font-medium tabular-nums">
+                {formatCents(totalFor(person.id))}
               </span>
-              <span>{formatCents(totalFor(person.id))}</span>
             </li>
           ))}
         </ul>
-
         {payer && (
-  <p className="rounded bg-blue-50 px-3 py-2 text-sm">
-    {payer.name} paid the bill and gets back <strong>{formatCents(getsBack)}</strong>.
-  </p>
-)}
-
-        <p className="flex justify-between font-semibold border-t pt-2">
+          <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+            {payer.name} paid the bill and gets back{" "}
+            <strong>{formatCents(getsBack)}</strong>.
+          </p>
+        )}
+        <p className="flex justify-between border-t border-neutral-100 pt-3 font-semibold">
           <span>Bill total</span>
-          <span>{formatCents(billTotal)}</span>
+          <span className="tabular-nums">{formatCents(billTotal)}</span>
         </p>
-      </section>
+      </Card>
     </main>
   );
 }
