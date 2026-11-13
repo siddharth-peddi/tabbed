@@ -83,6 +83,10 @@ export default function Home() {
     return (subtotals[id] ?? 0) + (taxShares[id] ?? 0) + (tipShares[id] ?? 0);
   }
 
+  const getsBack = people
+  .filter((person) => person.id !== paidBy)
+  .reduce((sum, person) => sum + totalFor(person.id), 0);
+
   return (
     <main className="mx-auto max-w-md p-6 space-y-8">
       <h1 className="text-3xl font-bold">Tabbed</h1>
@@ -228,12 +232,19 @@ export default function Home() {
               <span>
                 {person.name}
                 {payer && person.id !== paidBy && ` owes ${payer.name}`}
-                {person.id === paidBy && " (paid the bill)"}
+                {person.id === paidBy && " (their share)"}
               </span>
               <span>{formatCents(totalFor(person.id))}</span>
             </li>
           ))}
         </ul>
+
+        {payer && (
+  <p className="rounded bg-blue-50 px-3 py-2 text-sm">
+    {payer.name} paid the bill and gets back <strong>{formatCents(getsBack)}</strong>.
+  </p>
+)}
+
         <p className="flex justify-between font-semibold border-t pt-2">
           <span>Bill total</span>
           <span>{formatCents(billTotal)}</span>
